@@ -1,0 +1,56 @@
+% Requires in the preamble:  \usepackage{booktabs}  \usepackage{graphicx}
+% Values marked x.xxx come from the snippet in the chat (text-only and audio-only CIs / macro-F1).
+
+% ------------------------------------------------------------------
+% TABLE I — main results (benchmark of encoders + Top-K selection)
+% ------------------------------------------------------------------
+\begin{table}[t]
+\centering
+\caption{Speaker-independent depression detection on E-DAIC with four frozen acoustic encoders.
+Dev: 5-fold CV on Train+Val; test ($n{=}56$) evaluated once. Fusion: text + Top-K audio chunks + eGeMAPS;
+Kept: fraction of 5-s chunks retained by the learned selector. Bold: best within each group.
+$^\dagger$Encoder selected on dev; no selection used the test set.}
+\label{tab:main}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llcccc}
+\toprule
+Input & Encoder & Kept & Dev AUC & Test AUC [95\% CI] & Test F1$_{\mathrm{macro}}$ \\
+\midrule
+Text   & --                 & --      & 0.798          & \textbf{0.834} [x.xxx, x.xxx] & x.xxx \\ % TODO
+\midrule
+Audio  & WavLM              & 100\%   & 0.566          & 0.503 [x.xxx, x.xxx]          & x.xxx \\ % TODO
+Audio  & HuBERT             & 100\%   & \textbf{0.670} & \textbf{0.620} [x.xxx, x.xxx] & x.xxx \\ % TODO
+Audio  & Whisper-S          & 100\%   & 0.519          & 0.463 [x.xxx, x.xxx]          & x.xxx \\ % TODO
+Audio  & Whisper-B          & 100\%   & 0.540          & 0.541 [x.xxx, x.xxx]          & x.xxx \\ % TODO
+\midrule
+Fusion & WavLM$^\dagger$    & 20\%    & \textbf{0.829} & \textbf{0.808} [0.684, 0.902] & \textbf{0.755} \\
+Fusion & HuBERT             & 100\%   & 0.784          & 0.759 [0.632, 0.867]          & 0.679 \\
+Fusion & Whisper-S          & 20\%    & 0.781          & 0.803 [0.673, 0.902]          & \textbf{0.755} \\
+Fusion & Whisper-B          & 20\%    & 0.758          & 0.792 [0.667, 0.891]          & 0.689 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+% ------------------------------------------------------------------
+% TABLE II — paired statistical comparisons (contribution of audio + encoder ranking)
+% ------------------------------------------------------------------
+\begin{table}[t]
+\centering
+\caption{Paired bootstrap $\Delta$AUC (1000 resamples, 95\% CI) of the fusion models, on the same speakers.
+Left: fusion minus text-only (contribution of the acoustic branch). Right: difference to the dev-selected
+encoder (WavLM). $^{*}$CI excludes 0; $^{\circ}$upper bound rounds to 0.}
+\label{tab:delta}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{lccc}
+\toprule
+ & \multicolumn{2}{c}{Fusion $-$ Text-only} & Fusion $-$ Fusion(WavLM) \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-4}
+Encoder & Dev & Test & Test \\
+\midrule
+WavLM     & $+0.032$ [$-0.009$, $+0.071$]           & $-0.026$ [$-0.062$, $+0.004$]          & ref. \\
+HuBERT    & $-0.015$ [$-0.075$, $+0.046$]           & $-0.076$ [$-0.163$, $+0.001$]          & $-0.050$ [$-0.117$, $+0.019$] \\
+Whisper-S & $-0.015$ [$-0.064$, $+0.032$]           & $-0.032$ [$-0.070$, $+0.004$]          & $-0.006$ [$-0.032$, $+0.019$] \\
+Whisper-B & $-0.041$ [$-0.082$, $-0.000$]$^{\circ}$ & $-0.043$ [$-0.091$, $-0.001$]$^{*}$    & $-0.017$ [$-0.061$, $+0.019$] \\
+\bottomrule
+\end{tabular}}
+\end{table}
